@@ -1,16 +1,17 @@
+import requests
+
 API_URL = "https://www.alphavantage.co/query"
 API_KEY = "5V6R95XQRW35NXAW" 
 
-#Allows user to select a chart type
-def get_chart_type():
-    print("Chart Types")
-    print("----------------------")
-    print("1. Bar")
-    print("2. Line")
-    chart_choice = input("Enter the chart type you want (1, 2): ") #if user chooses 1 the result will be bar, otherwise line will be chosen
-    return "bar" if chart_choice == "1" else "line"
+def main():
+    symbol = input("Enter the stock symbol: ").upper()
 
-#Allows the user to select a time series type. Choices are 1-4 to associated time series. The default is daily for error handling. 
+    time_series = get_time_series()
+    stock_data = get_stock_data(symbol, time_series)
+
+    # print the stock data
+    print("stock data:", stock_data)
+
 def get_time_series(): 
     print("Select the Time Series of the chart you want to Generate")
     print("------------------------------")
@@ -31,3 +32,25 @@ def get_time_series():
     else:
         print("Invalid choice. Defaulting to Daily.")
         return "TIME_SERIES_DAILY"
+
+def get_stock_data(symbol, time_series):
+    parameters = {
+        "function": time_series,
+        "symbol": symbol,
+        "apikey": API_KEY,
+        "datatype": "json",
+    }
+
+    # for testing parameters
+    print("query prams:", parameters)
+
+    response = requests.get(API_URL, params=parameters)
+    data = response.json()  # makes it json
+
+    # print the response data for debugging
+    print("response data:", data)
+
+    return data
+
+if __name__ == "__main__":
+    main()
