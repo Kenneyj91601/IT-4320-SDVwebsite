@@ -57,3 +57,21 @@ def fetch_stock_data(symbol, function, interval="60min", month=None):
     else:
         print("No valid time series data found.")
         return None
+
+def filter_data_by_date(data, start_date, end_date):
+    filtered_data = {
+        date: values
+        for date, values in data.items()
+        if start_date <= datetime.strptime(date.split(" ")[0], "%Y-%m-%d").date() <= end_date
+    }
+    return pd.DataFrame.from_dict(filtered_data, orient='index')
+
+def filter_intraday_by_day(data, target_date):
+    """Filters intraday data to match the specific day from the user's input."""
+    target_date_str = target_date.strftime("%Y-%m-%d")
+    filtered_data = {
+        date: values
+        for date, values in data.items()
+        if date.startswith(target_date_str)
+    }
+    return pd.DataFrame.from_dict(filtered_data, orient='index')
