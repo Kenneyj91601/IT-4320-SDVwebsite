@@ -33,24 +33,27 @@ def get_time_series():
         print("Invalid choice. Defaulting to Daily.")
         return "TIME_SERIES_DAILY"
 
-def get_stock_data(symbol, time_series):
-    parameters = {
-        "function": time_series,
+def fetch_stock_data(symbol, function, interval="60min", month=None):
+    params = {
+        "function": function,
         "symbol": symbol,
         "apikey": API_KEY,
         "datatype": "json",
+        "outputsize": "full",  # Ensure full dataset
     }
 
-    # for testing parameters
-    print("query prams:", parameters)
+    if function == "TIME_SERIES_INTRADAY":
+        params["interval"] = interval
+        if month:
+            params["month"] = month 
 
-    response = requests.get(API_URL, params=parameters)
-    data = response.json()  # makes it json
+    response = requests.get(API_URL, params=params)
+    response.raise_for_status()
+    data = response.json()
 
-    # print the response data for debugging
-    print("response data:", data)
-
-    return data
-
-if __name__ == "__main__":
-    main()
+    time_series_key = next((key for key in data if "Time Series" in key), None)
+    if time_series_key:
+        return data[time_series_key]
+    else:
+        print("No valid time series data found.")
+        return None
