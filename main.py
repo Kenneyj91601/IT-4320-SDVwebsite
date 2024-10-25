@@ -78,7 +78,7 @@ def filter_data_by_date(data, start_date, end_date):
     return pd.DataFrame.from_dict(filtered_data, orient='index')
 
 def filter_intraday_by_day(data, target_date):
-    """Filters intraday data to match the specific day from the user's input."""
+    #Filters intraday data to match the specific day from the user's input.
     target_date_str = target_date.strftime("%Y-%m-%d")
     filtered_data = {
         date: values
@@ -108,7 +108,7 @@ def generate_chart(data, chart_type, symbol):
 
 def main():
     while True:
-        symbol = input("Enter the stock symbol (e.g., AAPL): ").upper()
+        symbol = input("Enter the stock symbol (AAPL, GOOGL...): ").upper()
         chart_type = get_chart_type()
         function = get_time_series()
 
