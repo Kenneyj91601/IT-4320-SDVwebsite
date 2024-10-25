@@ -1,5 +1,10 @@
 import requests
+import pygal
+import pandas as pd
+from datetime import datetime
+import webbrowser
 
+#API Information
 API_URL = "https://www.alphavantage.co/query"
 API_KEY = "5V6R95XQRW35NXAW" 
 
@@ -75,3 +80,22 @@ def filter_intraday_by_day(data, target_date):
         if date.startswith(target_date_str)
     }
     return pd.DataFrame.from_dict(filtered_data, orient='index')
+
+def generate_chart(data, chart_type, symbol):
+    if chart_type == "bar":
+        chart = pygal.Bar()
+    else:
+        chart = pygal.Line()
+
+    chart.title = f"{symbol} Stock Data"
+    chart.x_labels = list(data.index)
+
+    chart.add('Open Price', data['1. open'].astype(float).tolist())
+    chart.add('High Price', data['2. high'].astype(float).tolist())
+    chart.add('Low Price', data['3. low'].astype(float).tolist())
+    chart.add('Close Price', data['4. close'].astype(float).tolist())
+
+    chart_file = f"{symbol}_stock_chart.svg"
+    chart.render_to_file(chart_file)
+    print(f"Chart saved to {chart_file}.")
+    webbrowser.open(chart_file)
