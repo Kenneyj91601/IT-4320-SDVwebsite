@@ -3,6 +3,9 @@ import pygal
 import pandas as pd
 from datetime import datetime
 import webbrowser
+from flask import Flask, render_template, request, url_for, flash, redirect, abort
+
+app = Flask(__name__)
 
 # API Information
 API_URL = "https://www.alphavantage.co/query"
@@ -38,6 +41,7 @@ def get_time_series():
     else:
         print("Invalid choice. Defaulting to Daily.")
         return "TIME_SERIES_DAILY"
+
 # gets a datetime.date object if able and returns it
 def validate_date(date_str):
     try:
@@ -45,6 +49,7 @@ def validate_date(date_str):
     except ValueError:
         print("Invalid date format. Please use YYYY-MM-DD.")
         return None
+
 # Gets stock data from the api based on user choices. 
 def fetch_stock_data(symbol, function, interval="60min", month=None):
     params = {
@@ -70,6 +75,7 @@ def fetch_stock_data(symbol, function, interval="60min", month=None):
     else:
         print("No valid time series data found.")
         return None
+
 # filters stock data to include only entries within a specific range. Returns a pandas dataframe.
 def filter_data_by_date(data, start_date, end_date):
     filtered_data = {
@@ -88,6 +94,7 @@ def filter_intraday_by_day(data, target_date):
         if date.startswith(target_date_str)
     }
     return pd.DataFrame.from_dict(filtered_data, orient='index')
+
 #generates and saves a chart and opens in browser
 def generate_chart(data, chart_type, symbol):
     if chart_type == "bar":
@@ -107,6 +114,8 @@ def generate_chart(data, chart_type, symbol):
     chart.render_to_file(chart_file)
     print(f"Chart saved to {chart_file}.")
     webbrowser.open(chart_file)
+
+"""
 #runs the program on a loop 
 def main():
     while True:
@@ -174,6 +183,15 @@ def main():
         if continue_prompt != 'yes':
             print("Exiting the program.")
             break
+"""
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+"""
 if __name__ == "__main__":
     main()
+"""
+
+app.run(host="0.0.0.0")
