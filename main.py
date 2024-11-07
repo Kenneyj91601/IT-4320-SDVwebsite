@@ -9,7 +9,13 @@ app = Flask(__name__)
 
 # API Information
 API_URL = "https://www.alphavantage.co/query"
-API_KEY = "5V6R95XQRW35NXAW" 
+API_KEY = "5V6R95XQRW35NXAW"
+
+csv_filepath = 'nasdaq-listed.csv'
+file = pd.read_csv(csv_filepath)
+
+symbols = file['Symbol'].tolist()
+
 
 #gets the chart type from user and defaults to line. 
 def get_chart_type():
@@ -21,14 +27,9 @@ def get_chart_type():
     return "bar" if chart_choice == "1" else "line"
 
 #gets the user to select a time series and defaults to daily
-def get_time_series():
-    print("Select the Time Series of the chart you want to Generate")
-    print("------------------------------")
-    print("1. Intraday")
-    print("2. Daily")
-    print("3. Weekly")
-    print("4. Monthly")
-    time_series_choice = input("Enter time series option (1, 2, 3, 4): ")
+def get_time_series(choice):
+
+    time_series_choice = choice
 
     if time_series_choice == "1":
         return "TIME_SERIES_INTRADAY"
@@ -41,14 +42,6 @@ def get_time_series():
     else:
         print("Invalid choice. Defaulting to Daily.")
         return "TIME_SERIES_DAILY"
-
-# gets a datetime.date object if able and returns it
-def validate_date(date_str):
-    try:
-        return datetime.strptime(date_str, "%Y-%m-%d").date()
-    except ValueError:
-        print("Invalid date format. Please use YYYY-MM-DD.")
-        return None
 
 # Gets stock data from the api based on user choices. 
 def fetch_stock_data(symbol, function, interval="60min", month=None):
@@ -114,6 +107,7 @@ def generate_chart(data, chart_type, symbol):
     chart.render_to_file(chart_file)
     print(f"Chart saved to {chart_file}.")
     webbrowser.open(chart_file)
+
 
 """
 #runs the program on a loop 
@@ -185,9 +179,12 @@ def main():
             break
 """
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+
+    symbolsList = symbols
+
+    return render_template('index.html', symbolsList=symbols)
 
 """
 if __name__ == "__main__":
